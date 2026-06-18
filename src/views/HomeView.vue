@@ -1,0 +1,182 @@
+<template>
+  <div class="landing-page">
+    <section class="landing-hero container" id="who-we-are">
+      <div class="hero-orb hero-orb-a"></div>
+      <div class="hero-orb hero-orb-b"></div>
+      <div class="row align-items-center g-4 g-xl-5 position-relative">
+        <div class="col-lg-7">
+          <div class="section-label">Who We Are</div>
+          <h1 class="display-title mt-3">
+            Continuous GitHub security intelligence built for teams that ship fast.
+          </h1>
+          <p class="hero-copy mt-4">
+            We combine static security scanning, secret detection, dependency checks, AI remediation, and trend analysis
+            into one continuous workflow. The result is a product that helps developers act faster and security teams
+            prioritize with clarity.
+          </p>
+          <div class="d-flex flex-wrap gap-3 mt-4">
+            <router-link class="btn btn-warning btn-lg fw-semibold" to="/register">Start scanning</router-link>
+            <router-link class="btn btn-outline-light btn-lg fw-semibold" to="/login">Sign in</router-link>
+          </div>
+          <div class="hero-stats mt-5">
+            <div class="hero-stat">
+              <span>4 scanners</span>
+              <small>Semgrep, Gitleaks, Composer Audit, npm Audit</small>
+            </div>
+            <div class="hero-stat">
+              <span>1 workflow</span>
+              <small>Manual and scheduled scans in one flow</small>
+            </div>
+            <div class="hero-stat">
+              <span>1 score</span>
+              <small>Security, quality, secret, dependency, and health</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="landing-orbit">
+            <div class="landing-orbit-core"></div>
+            <div class="orbit-card orbit-card-a">
+              <img :src="shieldIcon" alt="Shield icon" class="feature-icon" />
+              <div>
+                <div class="orbit-title">Security scans</div>
+                <p>Detect code issues before they become incidents.</p>
+              </div>
+            </div>
+            <div class="orbit-card orbit-card-b">
+              <img :src="radarIcon" alt="Radar icon" class="feature-icon" />
+              <div>
+                <div class="orbit-title">Live trends</div>
+                <p>Track scores over time across every repository.</p>
+              </div>
+            </div>
+            <div class="orbit-card orbit-card-c">
+              <img :src="brainIcon" alt="Brain icon" class="feature-icon" />
+              <div>
+                <div class="orbit-title">AI guidance</div>
+                <p>Turn noisy findings into readable remediation steps.</p>
+              </div>
+            </div>
+            <div class="orbit-card orbit-card-d">
+              <img :src="chartIcon" alt="Chart icon" class="feature-icon" />
+              <div>
+                <div class="orbit-title">Reporting</div>
+                <p>Generate downloadable PDF evidence for teams.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section-block" id="what-we-do">
+      <div class="row g-4">
+        <div class="col-12 col-xl-5">
+          <div class="section-label">What We Do</div>
+          <h2 class="section-title mt-3">A security platform with product design, not just logs.</h2>
+          <p class="section-copy mt-3">
+            The frontend is designed around clarity, speed, and motion. Each page turns raw scanner output into a
+            workflow a developer can understand in seconds.
+          </p>
+        </div>
+        <div class="col-12 col-xl-7">
+          <div class="row g-3">
+            <div v-for="feature in features" :key="feature.title" class="col-md-6">
+              <article class="feature-card h-100">
+                <img :src="feature.icon" :alt="`${feature.title} icon`" class="feature-icon feature-icon-lg" />
+                <h3>{{ feature.title }}</h3>
+                <p>{{ feature.description }}</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section-block" id="how-it-works">
+      <div class="section-label">How It Works</div>
+      <h2 class="section-title mt-3">From repository onboarding to automated remediation.</h2>
+      <div class="workflow-line mt-4">
+        <div v-for="step in steps" :key="step.title" class="workflow-step">
+          <div class="workflow-index">{{ step.index }}</div>
+          <h3>{{ step.title }}</h3>
+          <p>{{ step.description }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section-block" id="stack">
+      <div class="row g-4 align-items-start">
+        <div class="col-lg-5">
+          <div class="section-label">Built For</div>
+          <h2 class="section-title mt-3">Teams that need continuous visibility without manual overhead.</h2>
+          <p class="section-copy mt-3">
+            This stack is built for public repositories, recurring scans, historical context, and clear reporting for
+            both engineering and security reviewers.
+          </p>
+        </div>
+        <div class="col-lg-7">
+          <div class="glass-card stack-card">
+            <div class="stack-grid">
+              <span v-for="item in stackItems" :key="item" class="stack-pill">{{ item }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script setup>
+import shieldIcon from '../assets/icons/shield-gradient.svg'
+import radarIcon from '../assets/icons/radar-gradient.svg'
+import brainIcon from '../assets/icons/brain-gradient.svg'
+import chartIcon from '../assets/icons/chart-gradient.svg'
+
+const features = [
+  {
+    title: 'Continuous scanning',
+    description: 'Automate scans manually or on schedule, then surface findings in a single workflow.',
+    icon: shieldIcon
+  },
+  {
+    title: 'Trend intelligence',
+    description: 'Use live security, secret, dependency, and quality charts to track drift over time.',
+    icon: radarIcon
+  },
+  {
+    title: 'AI remediation',
+    description: 'Convert technical findings into plain English guidance and secure code examples.',
+    icon: brainIcon
+  },
+  {
+    title: 'Executive reporting',
+    description: 'Export professional PDF evidence with scores, trends, and remediation checklists.',
+    icon: chartIcon
+  }
+]
+
+const steps = [
+  { index: '01', title: 'Connect a repository', description: 'Add a public GitHub repo and choose manual or scheduled scanning.' },
+  { index: '02', title: 'Run static analysis', description: 'Clone safely, scan without executing code, and normalize findings.' },
+  { index: '03', title: 'Generate guidance', description: 'Create AI explanations, business impact, and fixes for each issue.' },
+  { index: '04', title: 'Track the trend', description: 'Persist scan history so your charts show improvement or regression.' }
+]
+
+const stackItems = [
+  'Vue 3',
+  'Bootstrap 5',
+  'Pinia',
+  'Axios',
+  'Chart.js',
+  'Laravel Sanctum',
+  'Queues',
+  'Scheduler',
+  'Semgrep',
+  'Gitleaks',
+  'Composer Audit',
+  'npm Audit',
+  'OpenAI'
+]
+</script>

@@ -3,21 +3,52 @@
     <div class="section-label">Repository Intake</div>
     <h1 class="page-title">Add a public GitHub repository.</h1>
     <p class="page-subtitle mb-4">Submit the repository URL and choose how often the scheduler should re-scan it.</p>
-    <form @submit.prevent>
+    <form @submit.prevent="submit">
       <div class="mb-3">
         <label class="form-label">GitHub Repository URL</label>
-        <input class="form-control form-control-lg" type="url" placeholder="https://github.com/owner/repo" />
+        <input v-model="form.url" class="form-control form-control-lg" type="url" placeholder="https://github.com/owner/repo" />
       </div>
       <div class="mb-3">
         <label class="form-label">Scan Frequency</label>
-        <select class="form-select form-select-lg">
-          <option>manual</option>
-          <option>daily</option>
-          <option>weekly</option>
-          <option>monthly</option>
+        <select v-model="form.scan_frequency" class="form-select form-select-lg">
+          <option value="manual">manual</option>
+          <option value="daily">daily</option>
+          <option value="weekly">weekly</option>
+          <option value="monthly">monthly</option>
         </select>
       </div>
-      <button class="btn btn-warning btn-lg fw-semibold">Save Repository</button>
+      <p v-if="error" class="text-danger small">{{ error }}</p>
+      <button class="btn btn-warning btn-lg fw-semibold" :disabled="loading">
+        {{ loading ? 'Saving...' : 'Save Repository' }}
+      </button>
     </form>
   </section>
 </template>
+
+<script setup>
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '../services/api'
+
+const router = useRouter()
+const loading = ref(false)
+const error = ref('')
+
+const form = reactive({
+  url: '',
+  scan_frequency: 'manual'
+})
+
+async function submit() {
+  loading.value = true
+  error.value = ''
+  try {
+    const { data } = await api.post('/repositories', form)
+    router.push(`/repositories/${data.id}`)
+  } catch (err) {
+    error.value = err?.response?.data?.message || 'Unable to save repository.'
+  } finally {
+    loading.value = false
+  }
+}
+</script>
