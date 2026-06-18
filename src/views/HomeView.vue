@@ -82,6 +82,33 @@
     </section>
 
     <section class="container section-block">
+      <div class="glass-card project-banner">
+        <div class="row g-4 align-items-start">
+          <div class="col-lg-5">
+            <div class="section-label">Project Identity</div>
+            <h2 class="section-title mt-3">AI-Powered GitHub Repository Security Analyzer and Remediation Advisor</h2>
+            <p class="section-copy mt-3 mb-0">
+              A DevSecOps platform for scanning public GitHub repositories, generating remediation guidance, and
+              tracking security trends over time.
+            </p>
+          </div>
+          <div class="col-lg-7">
+            <div class="project-grid">
+              <div class="project-card">
+                <div class="section-label">Short Term Goal</div>
+                <p>Deliver a working end-to-end system with authentication, repository scans, AI recommendations, PDF reports, and trend analytics.</p>
+              </div>
+              <div class="project-card">
+                <div class="section-label">Long Term Goal</div>
+                <p>Grow the platform into a continuous security intelligence product with stronger ML insights, better report automation, and team-level collaboration.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section-block">
       <div class="glass-card insight-band">
         <div class="row g-4 align-items-center">
           <div class="col-lg-5">
@@ -110,6 +137,39 @@
                 <h3>For operations</h3>
                 <p>Scheduled scans, queue-backed jobs, and repeatable evidence generation.</p>
               </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section-block" id="team">
+      <div class="row g-4 align-items-start">
+        <div class="col-lg-4">
+          <div class="section-label">Student Details</div>
+          <h2 class="section-title mt-3">Who is building the project.</h2>
+          <p class="section-copy mt-3 mb-0">
+            The team is responsible for the backend workflow, frontend experience, scanning pipeline, AI integration,
+            and reporting.
+          </p>
+        </div>
+        <div class="col-lg-8">
+          <div class="glass-card team-card">
+            <div class="table-responsive">
+              <table class="table table-darkish align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Student Name</th>
+                    <th>Student ID</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="student in students" :key="student.id">
+                    <td>{{ student.name }}</td>
+                    <td>{{ student.id }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -215,6 +275,13 @@ const features = [
     description: 'Export professional PDF evidence with scores, trends, and remediation checklists.',
     icon: chartIcon
   }
+]
+
+const students = [
+  { name: 'Prashant Poudel', id: 'SM20241901' },
+  { name: 'Dipak Acharya', id: 'SM20242323' },
+  { name: 'Sudip Gautam', id: 'SM20240532' },
+  { name: 'Sagar Dhakal', id: 'SM20240146' }
 ]
 
 const steps = [
