@@ -5,6 +5,11 @@
       <div class="hero-orb hero-orb-b"></div>
       <div class="row align-items-center g-4 g-xl-5 position-relative">
         <div class="col-lg-7">
+          <div class="hero-chip-row">
+            <span class="hero-chip">Continuous Scanning</span>
+            <span class="hero-chip">AI Recommendations</span>
+            <span class="hero-chip">Trend Analytics</span>
+          </div>
           <div class="section-label">Who We Are</div>
           <h1 class="display-title mt-3">
             Continuous GitHub security intelligence built for teams that ship fast.
@@ -31,6 +36,12 @@
               <span>1 score</span>
               <small>Security, quality, secret, dependency, and health</small>
             </div>
+          </div>
+          <div class="trust-strip mt-4">
+            <span>Public GitHub repos only</span>
+            <span>Safe static analysis</span>
+            <span>PDF reports</span>
+            <span>Live trend charts</span>
           </div>
         </div>
 
@@ -64,6 +75,41 @@
                 <div class="orbit-title">Reporting</div>
                 <p>Generate downloadable PDF evidence for teams.</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section-block">
+      <div class="glass-card insight-band">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-5">
+            <div class="section-label">Why Teams Use It</div>
+            <h2 class="section-title mt-3">A product layer on top of security scanning.</h2>
+            <p class="section-copy mt-3 mb-0">
+              We turn raw scanner output into a working system that developers can understand and security teams can
+              operationalize.
+            </p>
+          </div>
+          <div class="col-lg-7">
+            <div class="signal-grid">
+              <article class="signal-card">
+                <h3>For developers</h3>
+                <p>Fast, readable findings with AI explanations and secure code examples.</p>
+              </article>
+              <article class="signal-card">
+                <h3>For security teams</h3>
+                <p>Consistent scoring, historical trends, and report-ready outputs for review.</p>
+              </article>
+              <article class="signal-card">
+                <h3>For managers</h3>
+                <p>Health scores and remediation priorities that make risk easier to track.</p>
+              </article>
+              <article class="signal-card">
+                <h3>For operations</h3>
+                <p>Scheduled scans, queue-backed jobs, and repeatable evidence generation.</p>
+              </article>
             </div>
           </div>
         </div>
@@ -122,6 +168,20 @@
               <span v-for="item in stackItems" :key="item" class="stack-pill">{{ item }}</span>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container section-block pb-5">
+      <div class="cta-band">
+        <div>
+          <div class="section-label">Ready to start</div>
+          <h2 class="cta-title mt-3">Scan a repository and see the security story unfold.</h2>
+          <p class="section-copy mt-3 mb-0">Create an account, connect a public repo, and start your first scan.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-3">
+          <router-link class="btn btn-warning btn-lg fw-semibold" to="/register">Create account</router-link>
+          <router-link class="btn btn-outline-light btn-lg fw-semibold" to="/login">See the app</router-link>
         </div>
       </div>
     </section>
