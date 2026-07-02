@@ -8,8 +8,8 @@
         </router-link>
         <div class="ms-auto d-flex gap-2 align-items-center flex-wrap justify-content-end">
           <template v-if="isLanding">
-            <a class="btn btn-outline-light btn-sm" href="#who-we-are">Who we are</a>
-            <a class="btn btn-outline-light btn-sm" href="#how-it-works">How it works</a>
+            <router-link class="btn btn-outline-light btn-sm" to="/">Home</router-link>
+            <router-link class="btn btn-outline-light btn-sm" to="/who-we-are">Who we are</router-link>
             <router-link v-if="isAuthenticated" class="btn btn-warning btn-sm" to="/dashboard">Open app</router-link>
             <template v-else>
               <router-link class="btn btn-outline-light btn-sm" to="/login">Login</router-link>
@@ -48,7 +48,7 @@ const route = useRoute()
 const router = useRouter()
 
 const isAuthenticated = computed(() => Boolean(auth.token))
-const isLanding = computed(() => route.path === '/')
+const isLanding = computed(() => route.path === '/' || route.path === '/home' || route.path === '/who-we-are')
 const mainClass = computed(() => (isLanding.value ? 'landing-main' : 'container py-4 py-lg-5'))
 
 onMounted(async () => {
