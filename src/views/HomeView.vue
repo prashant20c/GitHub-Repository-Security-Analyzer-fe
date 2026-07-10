@@ -12,7 +12,7 @@
           </div>
           <div class="section-label">Home</div>
           <h1 class="display-title mt-3">
-            Security visibility for GitHub repositories, built for teams that move fast.
+            GIT Code Analyzer keeps repository security visible for teams that move fast.
           </h1>
           <p class="hero-copy mt-4">
             Monitor public repositories with safe static analysis, automated reports, historical trend charts, and

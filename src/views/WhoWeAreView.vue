@@ -12,7 +12,7 @@
           </div>
           <div class="section-label">Who We Are</div>
           <h1 class="display-title mt-3">
-            We are a student team building an AI-powered security analyzer for GitHub repositories.
+            We are a student team building GIT Code Analyzer for GitHub repositories.
           </h1>
           <p class="hero-copy mt-4">
             This page introduces the people behind the project, the project title, and the goals we are aiming to
@@ -27,7 +27,7 @@
         <div class="col-lg-5">
           <div class="glass-card project-banner h-100">
             <div class="section-label">Project Title</div>
-            <h2 class="section-title mt-3">AI-Powered GitHub Repository Security Analyzer and Remediation Advisor</h2>
+            <h2 class="section-title mt-3">GIT Code Analyzer</h2>
             <p class="section-copy mt-3 mb-0">
               Built to scan public repositories, generate AI remediation advice, and show trend analytics over time.
             </p>
