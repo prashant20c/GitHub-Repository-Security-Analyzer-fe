@@ -1,4 +1,4 @@
-# AI-Powered GitHub Repository Security Analyzer
+# GIT Code Analyzer
 
 ## Engineering Architecture
 

@@ -28,6 +28,10 @@
         </div>
         <div v-else class="vstack gap-3">
           <div>
+            <div class="text-secondary small">Repository</div>
+            <div class="fw-semibold">{{ repositoryLabel }}</div>
+          </div>
+          <div>
             <div class="text-secondary small">Severity</div>
             <div class="fw-semibold">{{ finding?.severity || 'Unknown' }}</div>
           </div>
@@ -110,9 +114,10 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '../services/api'
+import { getApiErrorMessage } from '../services/errors'
 
 const route = useRoute()
 const loading = ref(false)
@@ -121,15 +126,23 @@ const error = ref('')
 const finding = ref(null)
 const recommendation = ref(null)
 
+const repositoryLabel = computed(() => {
+  const repository = finding.value?.scan?.repository
+  if (!repository) return 'Unknown repository'
+
+  return `${repository.owner}/${repository.name}`
+})
+
 async function loadFinding() {
   loading.value = true
   error.value = ''
+
   try {
     const { data } = await api.get(`/findings/${route.params.id}`)
     finding.value = data
     recommendation.value = data.recommendation || null
   } catch (err) {
-    error.value = err?.response?.data?.message || 'Unable to load finding.'
+    error.value = getApiErrorMessage(err, 'Unable to load finding.')
   } finally {
     loading.value = false
   }
@@ -138,15 +151,23 @@ async function loadFinding() {
 async function generateRecommendation() {
   generating.value = true
   error.value = ''
+
   try {
     const { data } = await api.post(`/findings/${route.params.id}/generate-recommendation`)
     recommendation.value = data
   } catch (err) {
-    error.value = err?.response?.data?.message || 'Unable to generate recommendation.'
+    error.value = getApiErrorMessage(err, 'Unable to generate recommendation.')
   } finally {
     generating.value = false
   }
 }
 
 onMounted(loadFinding)
+
+watch(
+  () => route.params.id,
+  async () => {
+    await loadFinding()
+  }
+)
 </script>

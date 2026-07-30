@@ -1,9 +1,21 @@
 import { defineStore } from 'pinia'
 
+function readJson(key) {
+  const raw = localStorage.getItem(key)
+
+  if (!raw) return null
+
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('auth_token') || null,
-    user: JSON.parse(localStorage.getItem('auth_user') || 'null')
+    user: readJson('auth_user')
   }),
   actions: {
     setSession(token, user) {
@@ -24,6 +36,10 @@ export const useAuthStore = defineStore('auth', {
       this.user = data
       localStorage.setItem('auth_user', JSON.stringify(data))
       return data
+    },
+    hydrateSession() {
+      this.token = localStorage.getItem('auth_token') || null
+      this.user = readJson('auth_user')
     }
   }
 })

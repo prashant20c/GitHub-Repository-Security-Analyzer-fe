@@ -62,6 +62,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import api from '../services/api'
+import { getApiErrorMessage } from '../services/errors'
 
 const loading = ref(false)
 const error = ref('')
@@ -74,7 +75,7 @@ async function loadReports() {
     const { data } = await api.get('/reports')
     reports.value = data || []
   } catch (err) {
-    error.value = err?.response?.data?.message || 'Unable to load reports.'
+    error.value = getApiErrorMessage(err, 'Unable to load reports.')
   } finally {
     loading.value = false
   }
@@ -94,9 +95,9 @@ async function downloadReport(report) {
     document.body.appendChild(link)
     link.click()
     link.remove()
-    window.URL.revokeObjectURL(url)
+    window.setTimeout(() => window.URL.revokeObjectURL(url), 1000)
   } catch (err) {
-    error.value = err?.response?.data?.message || 'Unable to download report.'
+    error.value = getApiErrorMessage(err, 'Unable to download report.')
   }
 }
 
