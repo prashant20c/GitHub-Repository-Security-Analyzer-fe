@@ -1356,6 +1356,19 @@ h1, h2, h3, h4, h5, h6, .display-title, .section-title, .page-title, .cta-title 
 }
 
 .btn-outline-warning { --bs-btn-color: var(--teal); --bs-btn-border-color: rgba(216, 255, 62, 0.45); --bs-btn-hover-color: #080808; --bs-btn-hover-bg: var(--teal); --bs-btn-hover-border-color: var(--teal); }
+
+.verified-mark {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  place-items: center;
+  border: 1px solid rgba(216, 255, 62, 0.55);
+  border-radius: 50%;
+  background: rgba(216, 255, 62, 0.12);
+  color: var(--teal);
+  font-size: 2rem;
+  font-weight: 700;
+}
 .btn, .form-control, .form-select { border-radius: 7px; }
 .btn { font-family: ui-monospace, monospace; letter-spacing: -0.03em; }
 

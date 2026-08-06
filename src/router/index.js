@@ -5,6 +5,7 @@ const WhoWeAreView = () => import('../views/WhoWeAreView.vue')
 const LoginView = () => import('../views/LoginView.vue')
 const RegisterView = () => import('../views/RegisterView.vue')
 const VerifyEmailView = () => import('../views/VerifyEmailView.vue')
+const EmailVerifiedView = () => import('../views/EmailVerifiedView.vue')
 const ForgotPasswordView = () => import('../views/ForgotPasswordView.vue')
 const ResetPasswordView = () => import('../views/ResetPasswordView.vue')
 const DashboardView = () => import('../views/DashboardView.vue')
@@ -22,7 +23,7 @@ const routes = [
   { path: '/login', name: 'login', component: LoginView, meta: { shell: 'auth', guestOnly: true, section: 'Sign In' } },
   { path: '/register', name: 'register', component: RegisterView, meta: { shell: 'auth', guestOnly: true, section: 'Create Account' } },
   { path: '/verify-email', name: 'verify-email', component: VerifyEmailView, meta: { shell: 'auth', section: 'Verify Email' } },
-  { path: '/email-verified', name: 'email-verified', component: VerifyEmailView, meta: { shell: 'auth', section: 'Email Verified' } },
+  { path: '/email-verified', name: 'email-verified', component: EmailVerifiedView, meta: { shell: 'auth', section: 'Email Verified' } },
   { path: '/forgot-password', name: 'forgot-password', component: ForgotPasswordView, meta: { shell: 'auth', guestOnly: true, section: 'Forgot Password' } },
   { path: '/reset-password', name: 'reset-password', component: ResetPasswordView, meta: { shell: 'auth', section: 'Reset Password' } },
   { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { shell: 'app', requiresAuth: true, section: 'Dashboard' } },
