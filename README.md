@@ -1,10 +1,10 @@
 # GitHub-Repository-Security-Analyzer-fe
 
-# Frontend - AI-Powered GitHub Repository Security Analyzer
+# Frontend - GIT Code Analyzer
 
 ## Overview
 
-This frontend application provides the user interface for the AI-Powered GitHub Repository Security Analyzer and Remediation Advisor.
+This frontend application provides the user interface for GIT Code Analyzer.
 
 Users can:
 

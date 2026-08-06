@@ -6,7 +6,14 @@
     <form @submit.prevent="submit">
       <div class="mb-3">
         <label class="form-label">GitHub Repository URL</label>
-        <input v-model="form.url" class="form-control form-control-lg" type="url" placeholder="https://github.com/owner/repo" />
+        <input
+          v-model.trim="form.url"
+          class="form-control form-control-lg"
+          type="url"
+          placeholder="https://github.com/owner/repo"
+          required
+        />
+        <small class="text-secondary d-block mt-2">Only public GitHub repositories are accepted by the backend.</small>
       </div>
       <div class="mb-3">
         <label class="form-label">Scan Frequency</label>
@@ -29,6 +36,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../services/api'
+import { getApiErrorMessage } from '../services/errors'
 
 const router = useRouter()
 const loading = ref(false)
@@ -43,10 +51,13 @@ async function submit() {
   loading.value = true
   error.value = ''
   try {
-    const { data } = await api.post('/repositories', form)
+    const { data } = await api.post('/repositories', {
+      url: form.url.trim(),
+      scan_frequency: form.scan_frequency
+    })
     router.push(`/repositories/${data.id}`)
   } catch (err) {
-    error.value = err?.response?.data?.message || 'Unable to save repository.'
+    error.value = getApiErrorMessage(err, 'Unable to save repository.')
   } finally {
     loading.value = false
   }

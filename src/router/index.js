@@ -7,22 +7,24 @@ import RegisterView from '../views/RegisterView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import RepositoryCreateView from '../views/RepositoryCreateView.vue'
 import RepositoryDetailView from '../views/RepositoryDetailView.vue'
+import RepositoryScansView from '../views/RepositoryScansView.vue'
 import ScanDetailView from '../views/ScanDetailView.vue'
 import FindingDetailView from '../views/FindingDetailView.vue'
 import ReportsView from '../views/ReportsView.vue'
 
 const routes = [
-  { path: '/', component: HomeView },
-  { path: '/home', component: HomeView },
-  { path: '/who-we-are', component: WhoWeAreView },
-  { path: '/login', component: LoginView, meta: { guestOnly: true } },
-  { path: '/register', component: RegisterView, meta: { guestOnly: true } },
-  { path: '/dashboard', component: DashboardView, meta: { requiresAuth: true } },
-  { path: '/repositories/new', component: RepositoryCreateView, meta: { requiresAuth: true } },
-  { path: '/repositories/:id', component: RepositoryDetailView, props: true, meta: { requiresAuth: true } },
-  { path: '/scans/:id', component: ScanDetailView, props: true, meta: { requiresAuth: true } },
-  { path: '/findings/:id', component: FindingDetailView, props: true, meta: { requiresAuth: true } },
-  { path: '/reports', component: ReportsView, meta: { requiresAuth: true } },
+  { path: '/', name: 'home', component: HomeView, meta: { shell: 'public', section: 'Home' } },
+  { path: '/home', redirect: { name: 'home' } },
+  { path: '/who-we-are', name: 'who-we-are', component: WhoWeAreView, meta: { shell: 'public', section: 'Who We Are' } },
+  { path: '/login', name: 'login', component: LoginView, meta: { shell: 'auth', guestOnly: true, section: 'Sign In' } },
+  { path: '/register', name: 'register', component: RegisterView, meta: { shell: 'auth', guestOnly: true, section: 'Create Account' } },
+  { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { shell: 'app', requiresAuth: true, section: 'Dashboard' } },
+  { path: '/repositories/new', name: 'repository-create', component: RepositoryCreateView, meta: { shell: 'app', requiresAuth: true, section: 'Add Repository' } },
+  { path: '/repositories/:id', name: 'repository-detail', component: RepositoryDetailView, props: true, meta: { shell: 'app', requiresAuth: true, section: 'Repository Detail' } },
+  { path: '/repositories/:id/scans', name: 'repository-scans', component: RepositoryScansView, props: true, meta: { shell: 'app', requiresAuth: true, section: 'Repository Scans' } },
+  { path: '/scans/:id', name: 'scan-detail', component: ScanDetailView, props: true, meta: { shell: 'app', requiresAuth: true, section: 'Scan Detail' } },
+  { path: '/findings/:id', name: 'finding-detail', component: FindingDetailView, props: true, meta: { shell: 'app', requiresAuth: true, section: 'Finding Detail' } },
+  { path: '/reports', name: 'reports', component: ReportsView, meta: { shell: 'app', requiresAuth: true, section: 'Reports' } },
   { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
@@ -44,6 +46,12 @@ router.beforeEach((to) => {
   }
 
   return true
+})
+
+router.afterEach((to) => {
+  if (typeof document !== 'undefined') {
+    document.title = `${to.meta.section || 'GIT Code Analyzer'} | GIT Code Analyzer`
+  }
 })
 
 export default router
