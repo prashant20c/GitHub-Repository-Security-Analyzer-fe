@@ -54,7 +54,7 @@
           <article v-for="scan in scans" :key="scan.id" class="repo-list-item">
             <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-start">
               <div>
-                <div class="fw-semibold">Scan #{{ scan.id }}</div>
+                <div class="fw-semibold">Scan #{{ scanNumber(scan) }}</div>
                 <div class="text-secondary small">{{ formatDate(scan.created_at) }} · {{ scan.status }}</div>
               </div>
               <router-link class="btn btn-outline-light btn-sm" :to="`/scans/${scan.id}`">
@@ -67,11 +67,11 @@
                 <ul class="repo-scan-bullets mt-3">
                   <li>
                     <span>Health score</span>
-                    <span>{{ healthScoreDisplay(scan.analytics?.overall_health_score ?? scan.overall_health_score) }}</span>
+                    <span>{{ scanScoreDisplay(scan, 'overall_health_score') }}</span>
                   </li>
                   <li>
                     <span>Security score</span>
-                    <span>{{ scoreValue(scan.analytics?.security_score ?? scan.security_score) }}</span>
+                    <span>{{ scanScoreDisplay(scan, 'security_score') }}</span>
                   </li>
                   <li>
                     <span>Findings</span>
@@ -123,7 +123,11 @@ const isRunning = computed(() => {
   return status === 'running' || status === 'in_progress' || status === 'pending'
 })
 const repositoryProgressLabel = computed(() => {
+  if (!latestScan.value) return '0/100 · Poor'
+
   const latestScore = scoreValue(latestScan.value?.analytics?.overall_health_score ?? latestScan.value?.overall_health_score)
+  if (isRunning.value) return 'Running'
+
   return `${latestScore}/100 · ${healthScoreGrade(latestScore)}`
 })
 const progressWidth = computed(() => {
@@ -141,6 +145,10 @@ async function loadRepositoryScans() {
     scans.value = Array.isArray(data?.scans)
       ? data.scans.slice().sort((left, right) => new Date(right.created_at) - new Date(left.created_at))
       : []
+    scans.value = scans.value.map((scan, index, orderedScans) => ({
+      ...scan,
+      history_number: orderedScans.length - index
+    }))
   } catch (err) {
     error.value = getApiErrorMessage(err, 'Unable to load repository scans.')
     repository.value = null
@@ -155,9 +163,23 @@ function scoreValue(value) {
   return Number.isFinite(score) ? score : 0
 }
 
+function scanNumber(scan) {
+  return scan?.history_number || scans.value.length || 1
+}
+
 function healthScoreDisplay(score) {
   const normalized = scoreValue(score)
   return `${normalized}/100 · ${healthScoreGrade(normalized)}`
+}
+
+function scanScoreDisplay(scan, field) {
+  if (!scan) return 'N/A'
+
+  const status = String(scan.status || '').toLowerCase()
+  if (status !== 'completed') return status ? status[0].toUpperCase() + status.slice(1) : 'Pending'
+
+  const score = Number(scan.analytics?.[field] ?? scan[field])
+  return Number.isFinite(score) ? `${Math.max(0, Math.min(100, score))}/100` : 'N/A'
 }
 
 function healthScoreGrade(score) {

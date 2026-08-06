@@ -34,6 +34,20 @@
       </div>
     </div>
 
+    <div v-if="isScanRunning" class="col-12">
+      <div class="scan-running-panel">
+        <span class="scan-running-spinner" aria-hidden="true"></span>
+        <div>
+          <div class="section-label">Live Scan</div>
+          <div class="fw-semibold">Security analysis is running</div>
+          <p class="text-secondary small mb-0 mt-1">
+            Repository code is being cloned and checked. This page refreshes automatically.
+          </p>
+        </div>
+        <span class="status-pill ms-auto">{{ scan?.status || 'pending' }}</span>
+      </div>
+    </div>
+
     <div class="col-md-6 col-xl-3" v-for="card in cards" :key="card.label">
       <MetricCard
         :label="card.label"
@@ -180,7 +194,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import api from '../services/api'
 import MetricCard from '../components/MetricCard.vue'
@@ -197,7 +211,7 @@ const reports = ref([])
 
 const isScanRunning = computed(() => {
   const status = String(scan.value?.status || '').toLowerCase()
-  return status === 'running' || status === 'in_progress'
+  return status === 'pending' || status === 'running' || status === 'in_progress'
 })
 
 const repositoryLabel = computed(() => {
@@ -228,13 +242,13 @@ const cards = computed(() => [
   { label: 'Status', value: scan.value?.status || 'Pending', hint: 'Current scan state', numeric: false },
   {
     label: 'Security Score',
-    value: scan.value?.security_score ?? scan.value?.analytics?.security_score ?? 'N/A',
+    value: scanMetric('security_score'),
     hint: 'Normalized security result',
     numeric: true
   },
   {
     label: 'Health Score',
-    value: scan.value?.overall_health_score ?? scan.value?.analytics?.overall_health_score ?? 'N/A',
+    value: scanMetric('overall_health_score'),
     hint: `Overall repository posture · ${healthScoreGrade(
       scan.value?.overall_health_score ?? scan.value?.analytics?.overall_health_score ?? 0
     )}`,
@@ -254,8 +268,16 @@ const series = computed(() =>
     }))
 )
 
-async function loadScan() {
-  loading.value = true
+function scanMetric(field) {
+  const status = String(scan.value?.status || '').toLowerCase()
+  if (status !== 'completed') return 'N/A'
+
+  const value = Number(scan.value?.[field] ?? scan.value?.analytics?.[field])
+  return Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : 'N/A'
+}
+
+async function loadScan(silent = false) {
+  if (!silent) loading.value = true
   error.value = ''
 
   try {
@@ -270,7 +292,7 @@ async function loadScan() {
   } catch (err) {
     error.value = getApiErrorMessage(err, 'Unable to load scan.')
   } finally {
-    loading.value = false
+    if (!silent) loading.value = false
   }
 }
 
@@ -326,12 +348,32 @@ function healthScoreGrade(score) {
   return 'Poor'
 }
 
-onMounted(loadScan)
+let refreshTimer = null
+
+onMounted(async () => {
+  await loadScan()
+  refreshTimer = window.setInterval(() => {
+    if (isScanRunning.value) {
+      loadScan(true)
+    } else if (refreshTimer) {
+      window.clearInterval(refreshTimer)
+      refreshTimer = null
+    }
+  }, 5000)
+})
 
 watch(
   () => route.params.id,
   async () => {
+    if (refreshTimer) {
+      window.clearInterval(refreshTimer)
+      refreshTimer = null
+    }
     await loadScan()
   }
 )
+
+onBeforeUnmount(() => {
+  if (refreshTimer) window.clearInterval(refreshTimer)
+})
 </script>

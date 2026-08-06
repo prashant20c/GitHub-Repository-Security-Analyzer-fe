@@ -15,7 +15,7 @@
             class="btn btn-outline-warning btn-sm scan-action-button"
             type="button"
             @click="runScan"
-            :disabled="actionBusy || pageLoading || !repository"
+            :disabled="actionBusy || pageLoading || !repository || isLatestScanRunning"
             :class="{ 'is-running': actionBusy }"
           >
             <span v-if="actionBusy" class="scan-action-indicator" aria-hidden="true"></span>
@@ -55,11 +55,11 @@
           </div>
           <div class="col-md-4 col-lg-2">
             <label class="form-label small text-secondary">Next Scan</label>
-            <div class="form-control bg-transparent text-light">{{ formatDate(repository?.next_scan_at) }}</div>
+            <div class="form-control bg-transparent text-light">{{ formatDate(repository?.next_scan_at, 'Not scheduled') }}</div>
           </div>
           <div class="col-md-4 col-lg-2">
             <label class="form-label small text-secondary">Last Scan</label>
-            <div class="form-control bg-transparent text-light">{{ formatDate(repository?.last_scan_at) }}</div>
+            <div class="form-control bg-transparent text-light">{{ formatDate(repository?.last_scan_at, 'No scans yet') }}</div>
           </div>
         </div>
       </div>
@@ -114,11 +114,11 @@
                 @keydown.space.prevent="openScan(scan.id)"
               >
                 <td>
-                  <span class="text-decoration-none">#{{ scan.id }}</span>
+                  <span class="text-decoration-none">#{{ scanNumber(scan) }}</span>
                 </td>
                 <td>{{ scan.status }}</td>
-                <td>{{ healthScoreDisplay(scan.overall_health_score ?? scan.analytics?.overall_health_score) }}</td>
-                <td>{{ scan.security_score ?? 'N/A' }}</td>
+                <td>{{ scanScoreDisplay(scan, 'overall_health_score') }}</td>
+                <td>{{ scanScoreDisplay(scan, 'security_score') }}</td>
                 <td>{{ analyticsByScanId[scan.id]?.risk_level || 'N/A' }}</td>
                 <td>{{ formatDate(scan.created_at) }}</td>
               </tr>
@@ -168,6 +168,10 @@ const repositoryLabel = computed(() => {
 })
 
 const latestScan = computed(() => scans.value[0] || null)
+const isLatestScanRunning = computed(() => {
+  const status = String(latestScan.value?.status || '').toLowerCase()
+  return status === 'pending' || status === 'running' || status === 'in_progress'
+})
 const latestAnalytics = computed(() => {
   const lastEntry = analyticsHistory.value.length ? analyticsHistory.value[analyticsHistory.value.length - 1] : null
   return lastEntry?.analytics || null
@@ -228,10 +232,16 @@ const charts = computed(() => [
 ])
 
 function toSeries(items, field) {
-  return (items || []).map((point, index) => ({
-    label: formatTrendLabel(point.created_at, index),
-    value: Number(point[field] || 0)
-  }))
+  return (items || [])
+    .map((point, index) => {
+      const value = Number(point[field])
+
+      return {
+        label: formatTrendLabel(point.created_at, index),
+        value: Number.isFinite(value) ? Math.max(0, Math.min(100, value)) : null
+      }
+    })
+    .filter((point) => point.value !== null)
 }
 
 function formatTrendLabel(value, fallbackIndex) {
@@ -261,6 +271,10 @@ async function loadRepository() {
     scans.value = (detailResponse.data.scans || [])
       .slice()
       .sort((left, right) => new Date(right.created_at) - new Date(left.created_at))
+      .map((scan, index, orderedScans) => ({
+        ...scan,
+        history_number: orderedScans.length - index
+      }))
     analyticsHistory.value = Array.isArray(analyticsResponse.data?.history) ? analyticsResponse.data.history : []
     schedule.scan_frequency = detailResponse.data.scan_frequency || 'manual'
 
@@ -305,16 +319,26 @@ async function updateSchedule() {
   }
 }
 
-function formatDate(value) {
-  if (!value) return 'Never'
+function formatDate(value, emptyLabel = 'Not available') {
+  if (!value) return emptyLabel
 
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? 'Never' : date.toLocaleString()
+  return Number.isNaN(date.getTime()) ? emptyLabel : date.toLocaleString()
 }
 
 function healthScoreDisplay(score) {
   const normalized = scoreValue(score)
   return `${normalized}/100 · ${healthScoreGrade(normalized)}`
+}
+
+function scanScoreDisplay(scan, field) {
+  if (!scan) return 'N/A'
+
+  const status = String(scan.status || '').toLowerCase()
+  if (status !== 'completed') return status ? status[0].toUpperCase() + status.slice(1) : 'Pending'
+
+  const score = Number(scan.analytics?.[field] ?? scan[field])
+  return Number.isFinite(score) ? `${Math.max(0, Math.min(100, score))}/100` : 'N/A'
 }
 
 function scoreValue(value) {
@@ -333,6 +357,10 @@ function healthScoreGrade(score) {
 
 function openScan(scanId) {
   router.push(`/scans/${scanId}`)
+}
+
+function scanNumber(scan) {
+  return scan?.history_number || scans.value.length || 1
 }
 
 let refreshTimer = null

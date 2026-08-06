@@ -26,7 +26,7 @@
       </div>
       <p v-if="error" class="text-danger small">{{ error }}</p>
       <button class="btn btn-warning btn-lg fw-semibold" :disabled="loading">
-        {{ loading ? 'Saving...' : 'Save Repository' }}
+        {{ loading ? 'Saving and starting scan...' : 'Save Repository' }}
       </button>
     </form>
   </section>
@@ -57,7 +57,7 @@ async function submit() {
     })
     router.push(`/repositories/${data.id}`)
   } catch (err) {
-    error.value = getApiErrorMessage(err, 'Unable to save repository.')
+    error.value = getApiErrorMessage(err, 'Repository saved, but the initial scan could not be started.')
   } finally {
     loading.value = false
   }
