@@ -99,6 +99,9 @@ function renderChart() {
           grid: { color: 'rgba(148, 163, 184, 0.08)' }
         },
         y: {
+          min: 0,
+          max: 100,
+          beginAtZero: true,
           ticks: { color: '#94a3b8' },
           grid: { color: 'rgba(148, 163, 184, 0.08)' }
         }

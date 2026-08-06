@@ -6,35 +6,34 @@
       <div class="row align-items-center g-4 g-xl-5 position-relative">
         <div class="col-lg-7">
           <div class="hero-chip-row">
-            <span class="hero-chip">Continuous Scanning</span>
-            <span class="hero-chip">Trend Analytics</span>
-            <span class="hero-chip">Report Automation</span>
+            <span class="hero-chip">PUBLIC REPOSITORIES</span>
+            <span class="hero-chip">STATIC ANALYSIS</span>
+            <span class="hero-chip">ACTIONABLE SIGNAL</span>
           </div>
-          <div class="section-label">Home</div>
+          <div class="section-label">GIT SECURITY / 01</div>
           <h1 class="display-title mt-3">
-            GIT Code Analyzer keeps repository security visible for teams that move fast.
+            Security intelligence for code that ships.
           </h1>
           <p class="hero-copy mt-4">
-            Monitor public repositories with safe static analysis, automated reports, historical trend charts, and
-            AI-backed remediation guidance. The home page focuses on the product value, not the team details.
+            Scan a public GitHub repository, surface the risks that matter, and turn every finding into a clear next
+            step. One operational loop for security, dependencies, secrets, and code quality.
           </p>
           <div class="d-flex flex-wrap gap-3 mt-4">
-            <router-link class="btn btn-warning btn-lg fw-semibold" to="/register">Get started</router-link>
-            <router-link class="btn btn-outline-light btn-lg fw-semibold" to="/login">Sign in</router-link>
-            <router-link class="btn btn-outline-light btn-lg fw-semibold" to="/who-we-are">Who we are</router-link>
+            <router-link class="btn btn-warning btn-lg fw-semibold" to="/register">Start a scan <span aria-hidden="true">↗</span></router-link>
+            <router-link class="btn btn-outline-light btn-lg fw-semibold" to="/login">Open console</router-link>
           </div>
           <div class="hero-stats mt-5">
             <div class="hero-stat">
-              <span>4 scanners</span>
+              <span>04 scanners</span>
               <small>Semgrep, Gitleaks, Composer Audit, npm Audit</small>
             </div>
             <div class="hero-stat">
-              <span>Live trends</span>
-              <small>Security, dependency, secret, and quality charts</small>
+              <span>01 timeline</span>
+              <small>Health, dependency, secret, and quality movement</small>
             </div>
             <div class="hero-stat">
-              <span>AI advice</span>
-              <small>Human-readable remediation and code examples</small>
+              <span>∞ guidance</span>
+              <small>Human-readable remediation with code context</small>
             </div>
           </div>
         </div>

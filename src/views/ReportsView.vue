@@ -103,7 +103,8 @@ async function downloadReport(report) {
 
 function formatDate(value) {
   if (!value) return 'Not available'
-  return new Date(value).toLocaleString()
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? 'Not available' : date.toLocaleString()
 }
 
 onMounted(loadReports)

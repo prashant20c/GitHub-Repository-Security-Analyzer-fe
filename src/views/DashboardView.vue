@@ -50,7 +50,7 @@
                 <div class="d-flex flex-wrap gap-2 mt-3">
                   <span class="status-pill">{{ repository.scan_frequency }}</span>
                   <span class="status-pill repo-status-pill">{{ repositoryStatus(repository) }}</span>
-                  <span class="status-pill">{{ formatDate(repository.last_scan_at || latestScan(repository)?.created_at) }}</span>
+                  <span class="status-pill">{{ formatDate(repository.last_scan_at || latestScan(repository)?.created_at, 'No scans yet') }}</span>
                 </div>
               </div>
               <div class="d-flex flex-wrap gap-2 align-items-start">
@@ -58,11 +58,11 @@
                   class="btn btn-outline-warning btn-sm scan-action-button"
                   type="button"
                   @click="runScan(repository.id)"
-                  :disabled="runningScanId === repository.id"
+                  :disabled="runningScanId === repository.id || isRepositoryRunning(repository)"
                   :class="{ 'is-running': runningScanId === repository.id }"
                 >
                   <span v-if="runningScanId === repository.id" class="scan-action-indicator" aria-hidden="true"></span>
-                  {{ runningScanId === repository.id ? 'Scanning...' : 'Scan' }}
+                  {{ isRepositoryRunning(repository) ? 'Scanning...' : 'Scan' }}
                 </button>
                 <router-link class="btn btn-outline-light btn-sm" :to="`/repositories/${repository.id}`">
                   Open
@@ -95,7 +95,7 @@
                     <div class="mt-3">
                       <div class="d-flex flex-column flex-lg-row justify-content-between gap-3 align-items-start">
                         <div>
-                          <div class="fw-semibold">Latest scan #{{ latestScan(repository).id }}</div>
+                          <div class="fw-semibold">Latest scan #{{ latestScan(repository).history_number || 1 }}</div>
                           <div class="text-secondary small">{{ formatDate(latestScan(repository).created_at) }} · {{ latestScan(repository).status }}</div>
                         </div>
                         <div class="d-flex flex-wrap gap-2">
@@ -108,11 +108,11 @@
                       <ul class="repo-scan-bullets mt-3">
                         <li>
                           <span>Health score</span>
-                          <span>{{ healthScoreDisplay(latestScan(repository).analytics?.overall_health_score ?? latestScan(repository).overall_health_score) }}</span>
+                          <span>{{ scanScoreDisplay(latestScan(repository), 'overall_health_score') }}</span>
                         </li>
                         <li>
                           <span>Security score</span>
-                          <span>{{ scoreValue(latestScan(repository).analytics?.security_score ?? latestScan(repository).security_score) }}</span>
+                          <span>{{ scanScoreDisplay(latestScan(repository), 'security_score') }}</span>
                         </li>
                         <li>
                           <span>Findings</span>
@@ -154,7 +154,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import api from '../services/api'
 import { getApiErrorMessage } from '../services/errors'
 
@@ -162,6 +162,7 @@ const loading = ref(false)
 const error = ref('')
 const repositories = ref([])
 const runningScanId = ref(null)
+let refreshTimer = null
 
 async function loadDashboard() {
   loading.value = true
@@ -174,14 +175,25 @@ async function loadDashboard() {
         try {
           const { data: analytics } = await api.get(`/repositories/${repository.id}/analytics`)
           const history = Array.isArray(analytics?.history) ? analytics.history : []
-          const scans = history
+          const repositoryScans = Array.isArray(repository.scans) ? repository.scans : []
+          const scansById = new Map(repositoryScans.map((scan) => [scan.id, scan]))
+
+          history
             .map((scan) => ({
+              ...(scansById.get(scan.id) || {}),
               ...scan,
               repository_id: repository.id,
               repository_name: `${repository.owner}/${repository.name}`,
               analytics: scan.analytics || null
             }))
+            .forEach((scan) => scansById.set(scan.id, scan))
+
+          const scans = Array.from(scansById.values())
             .sort((left, right) => new Date(right.created_at) - new Date(left.created_at))
+            .map((scan, index, orderedScans) => ({
+              ...scan,
+              history_number: orderedScans.length - index
+            }))
 
           return {
             ...repository,
@@ -232,12 +244,16 @@ function latestScan(repository) {
 
 function latestHealthScore(repository) {
   const scan = latestScan(repository)
+  if (!isCompletedScan(scan)) return 0
+
   const value = Number(scan?.analytics?.overall_health_score ?? scan?.overall_health_score)
   return Number.isFinite(value) ? value : 0
 }
 
 function latestSecurityScore(repository) {
   const scan = latestScan(repository)
+  if (!isCompletedScan(scan)) return 0
+
   const value = Number(scan?.analytics?.security_score ?? scan?.security_score)
   return Number.isFinite(value) ? value : 0
 }
@@ -271,6 +287,18 @@ function scoreValue(value) {
   return Number.isFinite(score) ? score : 0
 }
 
+function isCompletedScan(scan) {
+  return String(scan?.status || '').toLowerCase() === 'completed'
+}
+
+function scanScoreDisplay(scan, field) {
+  if (!scan) return 'N/A'
+  if (!isCompletedScan(scan)) return String(scan.status || 'Pending')
+
+  const value = Number(scan.analytics?.[field] ?? scan[field])
+  return Number.isFinite(value) ? `${Math.max(0, Math.min(100, value))}/100` : 'N/A'
+}
+
 function healthScoreDisplay(score) {
   const normalized = scoreValue(score)
   return `${normalized}/100 · ${healthScoreGrade(normalized)}`
@@ -291,12 +319,21 @@ function repositoryStatus(repository) {
   return String(scan.status || 'Unknown')
 }
 
-function formatDate(value) {
-  if (!value) return 'Never'
+function formatDate(value, emptyLabel = 'Not available') {
+  if (!value) return emptyLabel
 
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? 'Never' : date.toLocaleString()
+  return Number.isNaN(date.getTime()) ? emptyLabel : date.toLocaleString()
 }
 
-onMounted(loadDashboard)
+onMounted(async () => {
+  await loadDashboard()
+  refreshTimer = window.setInterval(() => {
+    if (!loading.value) loadDashboard()
+  }, 15000)
+})
+
+onBeforeUnmount(() => {
+  if (refreshTimer) window.clearInterval(refreshTimer)
+})
 </script>

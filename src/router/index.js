@@ -1,16 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import HomeView from '../views/HomeView.vue'
-import WhoWeAreView from '../views/WhoWeAreView.vue'
-import LoginView from '../views/LoginView.vue'
-import RegisterView from '../views/RegisterView.vue'
-import DashboardView from '../views/DashboardView.vue'
-import RepositoryCreateView from '../views/RepositoryCreateView.vue'
-import RepositoryDetailView from '../views/RepositoryDetailView.vue'
-import RepositoryScansView from '../views/RepositoryScansView.vue'
-import ScanDetailView from '../views/ScanDetailView.vue'
-import FindingDetailView from '../views/FindingDetailView.vue'
-import ReportsView from '../views/ReportsView.vue'
+const HomeView = () => import('../views/HomeView.vue')
+const WhoWeAreView = () => import('../views/WhoWeAreView.vue')
+const LoginView = () => import('../views/LoginView.vue')
+const RegisterView = () => import('../views/RegisterView.vue')
+const VerifyEmailView = () => import('../views/VerifyEmailView.vue')
+const ForgotPasswordView = () => import('../views/ForgotPasswordView.vue')
+const ResetPasswordView = () => import('../views/ResetPasswordView.vue')
+const DashboardView = () => import('../views/DashboardView.vue')
+const RepositoryCreateView = () => import('../views/RepositoryCreateView.vue')
+const RepositoryDetailView = () => import('../views/RepositoryDetailView.vue')
+const RepositoryScansView = () => import('../views/RepositoryScansView.vue')
+const ScanDetailView = () => import('../views/ScanDetailView.vue')
+const FindingDetailView = () => import('../views/FindingDetailView.vue')
+const ReportsView = () => import('../views/ReportsView.vue')
 
 const routes = [
   { path: '/', name: 'home', component: HomeView, meta: { shell: 'public', section: 'Home' } },
@@ -18,6 +21,10 @@ const routes = [
   { path: '/who-we-are', name: 'who-we-are', component: WhoWeAreView, meta: { shell: 'public', section: 'Who We Are' } },
   { path: '/login', name: 'login', component: LoginView, meta: { shell: 'auth', guestOnly: true, section: 'Sign In' } },
   { path: '/register', name: 'register', component: RegisterView, meta: { shell: 'auth', guestOnly: true, section: 'Create Account' } },
+  { path: '/verify-email', name: 'verify-email', component: VerifyEmailView, meta: { shell: 'auth', section: 'Verify Email' } },
+  { path: '/email-verified', name: 'email-verified', component: VerifyEmailView, meta: { shell: 'auth', section: 'Email Verified' } },
+  { path: '/forgot-password', name: 'forgot-password', component: ForgotPasswordView, meta: { shell: 'auth', guestOnly: true, section: 'Forgot Password' } },
+  { path: '/reset-password', name: 'reset-password', component: ResetPasswordView, meta: { shell: 'auth', section: 'Reset Password' } },
   { path: '/dashboard', name: 'dashboard', component: DashboardView, meta: { shell: 'app', requiresAuth: true, section: 'Dashboard' } },
   { path: '/repositories/new', name: 'repository-create', component: RepositoryCreateView, meta: { shell: 'app', requiresAuth: true, section: 'Add Repository' } },
   { path: '/repositories/:id', name: 'repository-detail', component: RepositoryDetailView, props: true, meta: { shell: 'app', requiresAuth: true, section: 'Repository Detail' } },
@@ -35,7 +42,7 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   const auth = useAuthStore()
-  const token = auth.token || localStorage.getItem('auth_token')
+  const token = auth.token || sessionStorage.getItem('auth_token')
 
   if (to.meta.requiresAuth && !token) {
     return '/login'

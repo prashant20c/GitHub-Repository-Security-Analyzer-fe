@@ -58,7 +58,7 @@ async function submit() {
       password_confirmation: form.password_confirmation
     })
     auth.setSession(data.token, data.user)
-    router.push('/dashboard')
+    router.push('/verify-email')
   } catch (err) {
     error.value = getApiErrorMessage(err, 'Registration failed.')
   } finally {

@@ -12,6 +12,9 @@
         <label class="form-label">Password</label>
         <input v-model="form.password" class="form-control form-control-lg" type="password" autocomplete="current-password" placeholder="Your password" required />
       </div>
+      <div class="d-flex justify-content-end mb-3">
+        <router-link class="text-secondary small" to="/forgot-password">Forgot password?</router-link>
+      </div>
       <p v-if="error" class="text-danger small">{{ error }}</p>
       <button class="btn btn-warning btn-lg w-100 fw-semibold" :disabled="loading">
         {{ loading ? 'Signing in...' : 'Sign in' }}
@@ -48,6 +51,13 @@ async function submit() {
     auth.setSession(data.token, data.user)
     router.push('/dashboard')
   } catch (err) {
+    const responseData = err?.response?.data
+    if (responseData?.code === 'email_not_verified' && responseData.token && responseData.user) {
+      auth.setSession(responseData.token, responseData.user)
+      router.push('/verify-email')
+      return
+    }
+
     error.value = getApiErrorMessage(err, 'Login failed.')
   } finally {
     loading.value = false
